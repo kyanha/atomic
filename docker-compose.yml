@@ -2,8 +2,10 @@ services:
   server:
     build:
       context: .
-      dockerfile: server.dockerfile
+      target: server
     environment:
+      # Set to your domain to enable OAuth/MCP for Claude.ai:
+      # PUBLIC_URL: https://atomic.example.com
       - PUBLIC_URL=${PUBLIC_URL:-}
     volumes:
       - atomic-data:/data
@@ -14,22 +16,13 @@ services:
   web:
     build:
       context: .
-      dockerfile: web.dockerfile
-    networks:
-      - internal
-    restart: unless-stopped
-
-  proxy:
-    image: nginx:1.28-bookworm
+      target: web
     ports:
-      - "8080:80"
-    volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/atomic.conf:ro
+      - "80:8080"
     networks:
       - internal
     depends_on:
       - server
-      - web
     restart: unless-stopped
 
   litestream:
